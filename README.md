@@ -1,0 +1,1 @@
+## Ames housing, one hot encoding, standard scaler, robust scaler and backwards elimination
