@@ -19,15 +19,15 @@ class PredictPipeline:
             data_scaled_df = pd.DataFrame(data_scaled)
             for i in range(len(data_scaled_df.columns)):  
                 data_scaled_df = data_scaled_df.rename(columns={data_scaled_df.columns[i]: f'c{i+1}'})
-            data_scaled_df_be = data_scaled_df[['c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c13', 'c15', 'c16',
-                                                'c18', 'c22', 'c24', 'c30', 'c32', 'c34', 'c43', 'c44', 'c45',
-                                                'c47', 'c49', 'c51', 'c52', 'c53', 'c54', 'c57', 'c59', 'c67',
-                                                'c68', 'c76', 'c77', 'c78', 'c82', 'c83', 'c88', 'c89', 'c90',
-                                                'c96', 'c97', 'c103', 'c105', 'c116', 'c130', 'c134', 'c140',
-                                                'c143', 'c151', 'c153', 'c157', 'c158', 'c159', 'c160', 'c161',
-                                                'c166', 'c178', 'c182', 'c183', 'c184', 'c185', 'c186', 'c187',
-                                                'c195', 'c196', 'c202', 'c207', 'c209', 'c211', 'c223', 'c225',
-                                                'c228']]
+            data_scaled_df_be = data_scaled_df[['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10', 'c12',
+                                                'c13', 'c16', 'c18', 'c19', 'c20', 'c21', 'c22', 'c23', 'c24', 'c27',
+                                                'c30', 'c40', 'c43', 'c44', 'c45', 'c46', 'c47', 'c49', 'c51', 'c53',
+                                                'c58', 'c66', 'c67', 'c68', 'c71', 'c72', 'c74', 'c75', 'c76', 'c77',
+                                                'c81', 'c82', 'c87', 'c88', 'c93', 'c94', 'c96', 'c98', 'c99', 'c115',
+                                                'c132', 'c139', 'c152', 'c156', 'c157', 'c158', 'c159', 'c160', 'c165',
+                                                'c175', 'c176', 'c177', 'c181', 'c182', 'c183', 'c184', 'c185', 'c186',
+                                                'c189', 'c194', 'c195', 'c206', 'c208', 'c210', 'c222', 'c224']]
+            
             data_scaled_df_be_np = np.array(data_scaled_df_be)
             preds = model.predict(data_scaled_df_be_np)
             return preds
@@ -38,7 +38,7 @@ class PredictPipeline:
 
 class CustomData:
     def __init__(self, MS_SubClass: int, MS_Zoning: str, Lot_Frontage: float, Lot_Area: int,
-       Street: str, Lot_Shape: str, Land_Contour: str, Utilities: str,
+       Street: str, Lot_Shape: str, Land_Contour: str,
        Lot_Config: str, Land_Slope: str, Neighborhood: str, Conition_One: str,
        Condition_Two: str, Bldg_Type: str, House_Style: str, Overall_Qual: int,
        Overall_Cond: int, Year_Built: int, Year_Remod: int, Roof_Style: str, Roof_Matl: str,
@@ -63,7 +63,6 @@ class CustomData:
         self.Street = Street
         self.Lot_Shape = Lot_Shape
         self.Land_Contour = Land_Contour
-        self.Utilities = Utilities
         self.Lot_Config = Lot_Config
         self.Land_Slope = Land_Slope
         self.Neighborhood = Neighborhood
@@ -143,7 +142,6 @@ class CustomData:
                 "Street" : [self.Street],
                 "Lot_Shape" : [self.Lot_Shape], 
                 "Land_Contour" : [self.Land_Contour],
-                "Utilities" : [self.Utilities],
                 "Lot_Config" : [self.Lot_Config],
                 "Land_Slope" : [self.Land_Slope],
                 "Neighborhood" : [self.Neighborhood],

@@ -19,7 +19,7 @@ def get_requirements (file_path:str)-> List [str]:
 
 
 setup(
-name = 'ameshousing',
+name = 'ameshousingusingbackwardselimination',
 version='0.0.1',
 author= 'irtaza_ahmed',
 author_email='kaziirtaza@gmail.com',

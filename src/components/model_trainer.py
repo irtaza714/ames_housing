@@ -10,7 +10,7 @@ from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object, evaluate_models
 from catboost import CatBoostRegressor
-from sklearn.ensemble import ( AdaBoostRegressor, GradientBoostingRegressor, RandomForestRegressor)
+from sklearn.ensemble import AdaBoostRegressor, GradientBoostingRegressor, RandomForestRegressor
 
 
 @dataclass
@@ -134,7 +134,7 @@ class ModelTrainer:
             
             print ('Root Mean Squared Error Test:', RMSE_test)
             
-            return score_train, score_test, MAE_train, MAE_test, MSE_train, MSE_test, RMSE_train, RMSE_test
+            return score_train, score_test, MAE_train, MAE_test, MSE_train, MSE_test, RMSE_train, RMSE_test, best_model
             
         except Exception as e:
             raise CustomException(e,sys)

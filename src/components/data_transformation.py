@@ -39,7 +39,7 @@ class DataTransformation:
             
             no_outliers_num = ['Year_Remod', 'Half_Bath', 'Mo_Sold', 'Yr_Sold']
 
-            cat = ['MS_Zoning', 'Street', 'Lot_Shape', 'Land_Contour', 'Utilities',
+            cat = ['MS_Zoning', 'Street', 'Lot_Shape', 'Land_Contour',
                    'Lot_Config', 'Land_Slope', 'Neighborhood', 'Conition_One',
                    'Condition_Two', 'Bldg_Type', 'House_Style', 'Roof_Style', 'Roof_Matl',
                    'Exterior_First', 'Exterior_Second', 'Mas_Vnr_Type', 'Exter_Qual',
@@ -59,7 +59,8 @@ class DataTransformation:
 
             cat_pipeline = Pipeline( steps=
                                   [ ('imputer', SimpleImputer(missing_values = np.nan, strategy='most_frequent')),
-                                   ("ohe",OneHotEncoder())])
+                                   ('ohe', OneHotEncoder())
+                                   ])
             
             preprocessor = ColumnTransformer(
                 [
@@ -90,6 +91,15 @@ class DataTransformation:
 
             logging.info("Dropped target column from the train set to make the input data frame for model training")
 
+            constant_columns_x_train_transf = x_train_transf.columns[x_train_transf.nunique() == 1]
+
+            if len(constant_columns_x_train_transf) > 0:
+                 print("Constant columns found in x_train_transf:", constant_columns_x_train_transf)
+            else:
+                print("No constant columns found in x_train_transf.")
+
+            logging.info("Checked for constant columns in x_train_transf")
+
             y_train_transf = train['SalePrice']
 
             logging.info("Target feature obtained for model training")
@@ -97,7 +107,16 @@ class DataTransformation:
             x_test_transf = test.drop('SalePrice', axis=1)
 
             logging.info("Dropped target column from the test set to make the input data frame for model testing")
-            
+
+            constant_columns_x_test_transf = x_test_transf.columns[x_test_transf.nunique() == 1]
+
+            if len(constant_columns_x_test_transf) > 0:
+                 print("Constant columns found in x_test_transf:", constant_columns_x_test_transf)
+            else:
+                print("No constant columns found in x_test_transf.")
+
+            logging.info("Checked for constant columns in x_test_transf")      
+        
             y_test_transf = test['SalePrice']
 
             logging.info("Target feature obtained for model testing")
@@ -105,8 +124,6 @@ class DataTransformation:
             preprocessor = self.get_data_transformer_object()
             
             logging.info("Preprocessing object obtained")
-
-            # Fit the preprocessor on the training data
 
             x_train_transf_preprocessed = preprocessor.fit_transform(x_train_transf)
 
@@ -122,12 +139,23 @@ class DataTransformation:
 
             logging.info("x_train_transf dataframe columns renamed")
 
-            # Perform backward elimination using statsmodels
+            print ("x_train_transf_preprocessed_df shape before be:", x_train_transf_preprocessed_df.shape)
+
+            # print ("x_train_transf_preprocessed_df columns before be:", x_train_transf_preprocessed_df.columns)
+
+            constant_columns_x_train_transf_preprocessed_df = x_train_transf_preprocessed_df.columns[x_train_transf_preprocessed_df.nunique() == 1]
+
+            if len(constant_columns_x_train_transf_preprocessed_df) > 0:
+                 print("Constant columns found in x_train_transf_preprocessed_df:", constant_columns_x_train_transf_preprocessed_df)
+            else:
+                print("No constant columns found in x_train_transf_preprocessed_df.")
+
             x_train_transf_be = sm.add_constant(x_train_transf_preprocessed_df)  # Add a constant column for intercept
 
-            logging.info("Constant term added in x_train_transf for initiating backwards elimination")
+            # print ("x_train_transf_be columns after adding constant:", x_train_transf_be.columns)
+
+            logging.info("Constant column added in x_train_transf for initiating backwards elimination")
             
-            # Fit the initial model
             model = sm.OLS(y_train_transf, x_train_transf_be)
 
             logging.info("x_train_transf_be and y_train_transf fitted on the backwards elimintaion model")
@@ -136,7 +164,6 @@ class DataTransformation:
 
             logging.info("Backwards elimination results obtained")
 
-            # Perform backward elimination
             while True:
                  p_values = results.pvalues[1:]  # Exclude the constant column
                  max_p_value = p_values.max()
@@ -151,19 +178,20 @@ class DataTransformation:
             
             logging.info("Backwards elimination performed")
 
-            x_train_transf_be = x_train_transf_be.drop('c1', axis =1)
+            x_train_transf_be = x_train_transf_be.drop('const', axis =1)
 
-            # # new code
-            # self.selected_features = x_train_transf_be.columns
+            # print ("x_train columns after performing be and dropping the constant added for be:", x_train_transf_be.columns)
 
             logging.info("Features seleted for preprocessor after performing backwards elimination")
 
             # Print the final selected features
-            selected_features = x_train_transf_be.columns # Exclude the constant column
+            selected_features = x_train_transf_be.columns
 
             print ("selected fetures:", selected_features)
 
-            logging.info("Features seleted after performing backwards elimination")
+            print ("selected fetures len:", len(selected_features))
+
+            logging.info("Features selceted after performing backwards elimination")
              
             all_features = x_train_transf_preprocessed_df.columns
             
@@ -184,6 +212,13 @@ class DataTransformation:
                 x_test_transf_preprocessed_df = x_test_transf_preprocessed_df.rename(columns={x_test_transf_preprocessed_df.columns[i]: f'c{i+1}'})
 
             logging.info("x_test_transf dataframe columns renamed")
+
+            constant_columns_x_test_transf_preprocessed_df = x_test_transf_preprocessed_df.columns[x_test_transf_preprocessed_df.nunique() == 1]
+
+            if len(constant_columns_x_test_transf_preprocessed_df) > 0:
+                 print("Constant columns found in x_test_transf_preprocessed_df:", constant_columns_x_test_transf_preprocessed_df)
+            else:
+                print("No constant columns found in x_test_transf_preprocessed_df.")
             
             x_test_transf_be = x_test_transf_preprocessed_df.drop(not_selected_features, axis=1)
 
@@ -191,7 +226,11 @@ class DataTransformation:
 
             # print ("x_train_transf_be columns:", x_train_transf_be.columns)
 
+            # print ("x_train_transf_be shape:", x_train_transf_be.shape)
+
             # print ("x_test_transf_be columns:", x_test_transf_be.columns)
+
+            # print ("x_test_transf_be shape:", x_test_transf_be.shape)
 
             train_arr = np.c_[np.array(x_train_transf_be), np.array(y_train_transf)]
             
